@@ -1,0 +1,200 @@
+    <!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>BitMusic</title>
+        <!-- collection of general dependencies -->
+        <script type="text/javascript" src="javascripts/lib/jquery.js"></script>
+        <script type="text/javascript" src="javascripts/lib/json2.js"></script>
+        <script type="text/javascript" src="javascripts/lib/underscore.js"></script>
+        <script type="text/javascript" src="javascripts/lib/backbone.js"></script>
+        <script type="text/javascript" src="javascripts/lib/humane.js"></script>
+        
+        
+        <script>
+        	if (navigator.appVersion.indexOf("Linux")!=-1) alert("sometext");;
+
+        </script>
+        <!-- bittorrenttorque/backbrace submodule -->
+        <script type="text/javascript" src="javascripts/backbrace/backbrace.js"></script>
+        <!-- bittorrenttorque/btapp submodule -->
+        <script type="text/javascript" src="javascripts/btapp/btapp.js"></script>
+        <script type="text/javascript" src="javascripts/btapp/client.btapp.js"></script>
+        <script type="text/javascript" src="javascripts/btapp/plugin.btapp.js"></script>
+        <script type="text/javascript" src="javascripts/btapp/pairing.btapp.js"></script>
+        <!-- bittorrenttorque/jStorage submodule -->
+        <script type="text/javascript" src="javascripts/jStorage/jstorage.min.js"></script>
+
+        <!-- lipka/piecon submodule -->
+        <script type="text/javascript" src="javascripts/piecon/piecon.min.js"></script>
+
+        <!-- audio support -->
+        <link rel="stylesheet" href="https://dhmmkq83qb1x5.cloudfront.net/audio-js/audio-js.css" type="text/css" media="all" title="Audio JS" charset="utf-8">
+        <link rel="stylesheet" href="https://dhmmkq83qb1x5.cloudfront.net/audio-js/skins/hu.css" type="text/css" media="all" title="Audio JS" charset="utf-8">
+        <link rel="stylesheet" href="https://dhmmkq83qb1x5.cloudfront.net/audio-js/skins/tube.css" type="text/css" media="all" title="Audio JS" charset="utf-8">
+        <link rel="stylesheet" href="https://dhmmkq83qb1x5.cloudfront.net/audio-js/skins/vim.css" type="text/css" media="all" title="Audio JS" charset="utf-8">
+        <script src="audio-js/audio.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- video support -->
+        <link href="https://dhmmkq83qb1x5.cloudfront.net/video-js/video-js.css" rel="stylesheet">
+        <script src="https://dhmmkq83qb1x5.cloudfront.net/video-js/video.js"></script>
+
+        <script type="text/javascript" src="javascripts/application.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/application.css" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/font-awesome.css" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" />
+        
+        <link rel="icon" 
+              type="image/png" 
+              href="https://dhmmkq83qb1x5.cloudfront.net/images/favicon.png">
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-33355465-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+    </head>
+    <body>
+
+    <!-- templates -->
+    <script type="text/template", id="status_template">
+        <span><%= product %> ( <%= status %> ) </span>
+    </script>
+    <script type="text/template" id="torrent_download_template">
+        <h3>
+            Stream info
+            <a href="" class="icon-folder-open"></a>
+            <a href="" class="icon-remove"></a>
+        </h3>
+        <h6><%= hash %></h6>
+        <div class="torrent prog"><%= progress %></div>
+        <div>
+            <i class="icon-arrow-down"></i> <span class="download_speed"><%= download_speed %></span>
+            <i class="icon-arrow-up"></i> <span class="upload_speed"><%= upload_speed %></span>
+        </div>
+        <div class="swarm">Swarm: <%= peers %> Peers / <%= seeds %> Seeds</div>
+        <div class="eta"><%= eta %></div>
+        <div class="ratio">UL/DL Ratio: <%= ratio %></div>
+        <div class="files">
+            <% for(var i = 0; i < files.length; i++) { %>
+                <div class="file progress">
+                    <div class="bar" style="width: <%= files[i].progress %>%;"></div>
+                    <div class="text"><%= files[i].downloaded %> / <%= files[i].size %></div>
+                </div>
+            <% } %>
+        </div>
+
+    </script>
+    <script type="text/template" id="torrent_template">
+        <div class="torrent_container">
+            <h2 class="torrent_name"><%= name %></h2>
+
+    </script>
+    <script type="text/template" id="error_template">
+        <div class="error_container">
+            <p>Uh oh: <%= error %> ... This is still a beta. Waiting for the contents to complete downloading, then refreshing the page may allow you to play the file successfully.</p>
+            <p class="file_info"><%= name %></p>
+        </div>
+    </script>
+    <script type="text/template" id="video_template">
+        <div class="video_container">
+            <video id="<%= id %>" class="video-js vjs-default-skin" controls
+                preload="auto" width="auto" height="500"
+                data-setup="{}">
+            </video>
+            <p class="file_info"><%= name %></p>
+        </div>
+    </script>
+
+    <script type="text/template" id="audio_template">
+        <div class="audio-js-box vim-css">
+            <audio class="audio-js" controls preload>
+                <source src="<%= url %>">
+            </audio>
+            <p class="file_info"><%= name %></p>
+        </div>
+    </script>
+
+    <script type="text/template" id="input_template">
+        <form class="form-inline">
+            <span class="logo">BitMusic</span><br>
+            
+            <input type="text" class="input-xlarge" placeholder="Enter a .torrent/magnet link...">
+            <button type="submit" class="btn">Stream</button>
+<!--
+            <span>/</span>
+            <button class="btn" id="create">Create Torrent</button>
+-->
+        </form>
+       <div id="content">
+            <p>Check out our favourite tracks...</p>
+            # <a href="#http://s3.amazonaws.com/bitmusic/torrents/Metallica-Fade+to+Black-BT.torrent">Metallica - Fade to Black</a>&nbsp;&nbsp;
+            # <a href="#http://s3.amazonaws.com/bitmusic/torrents/DubstepLoop2-BT.mp3.torrent">Guitarfret22 - Dubstep 2</a>&nbsp;&nbsp;
+            # <a href="#http://s3.amazonaws.com/bitmusic/torrents/Wax-Pictures+of+You-BT.mp3.torrent">John Mayer Live</a>&nbsp;&nbsp;
+            <!--<a href="#http://archive.org/download/jj2008-06-14.mk4/jj2008-06-14.mk4_archive.torrent">Jack Johnson Live</a>&nbsp;&nbsp;
+            <a href="#http://vodo.net/media/torrents/An.Honest.Man.720p.x264-VODO.torrent">An Honest Man</a>&nbsp;&nbsp;
+            <a href="#http://vo.do/media/torrents/Pioneer.One.SEASON1.720p.x264-VODO.torrent">Pioneer Season 1</a>&nbsp;&nbsp;
+            <a href="#http://apps.bittorrent.com/torrents/PrettyLights-Bittorrent.torrent">Pretty Lights</a>&nbsp;&nbsp;-->
+        </div>
+    </script>
+
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a href="" class="onehash">BitMusic</a>
+                <span class="toolbox"></span>
+                <ul class="nav">
+      <li class="active"><a href="#">Home</a></li>
+      <li><a href="charts.html">Top 10</a></li>
+    </ul>
+            </div>
+        </div>
+    </div>
+    <script type="text/template" id="input_container_template">
+    </script>
+    <script type="text/template" id="media_container_template">
+        <div class="media container_background collapsed">
+            <span href="" class="icon"></span>
+            <div class="media container">
+                <div class="media_header"></div>
+                <div class="media"></div>
+            </div>
+        </div>
+        <div class="stats container_background collapsed">
+            <a href="" class="icon"></a>
+            <div class="stats container">
+                <div class="wrapper">
+                </div>
+            </div>
+        </div>
+        <div class="code container_background collapsed">
+            <a class="fork" href="https://github.com/bittorrenttorque/onehash.com"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/fork.png" alt="Fork me on GitHub"></a>
+            <a href="" class="icon"></a>
+            <div class="code container">
+                <div class="wrapper">
+                    var btapp = new Btapp;<br>
+                    btapp.connect();<br>
+                    <br>
+                    btapp.live('torrent * file * properties streaming_url', function(url, file_props, file) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;//create an html5 video/audio tag and play!<br>
+                    });<br>
+                    <br>
+                    //lets add some content that will get detected by the code above.<br>
+                    btapp.on('add', function(add) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;add.torrent('http://apps.bittorrent.com/torrents/PrettyLights-Bittorrent.torrent');<br>
+                    });<br>
+                </div>
+            </div>
+        </div>
+    </script>
+    </body>
+</html>
