@@ -1,0 +1,86 @@
+    <!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>BitMusic</title>
+       
+        <script type="text/javascript" src="javascripts/application.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/application.css" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/font-awesome.css" />
+        <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" />
+        
+        <link rel="icon" type="image/png" href="https://dhmmkq83qb1x5.cloudfront.net/images/favicon.png">
+
+    </head>
+    <body>
+
+       
+
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="onehash">BitMusic&nbsp;&nbsp;&nbsp;</a>
+                <span class="toolbox"></span>
+                <ul class="nav">
+      <li><a href="#">Home</a></li>
+      <li><a href="charts.html">About</a></li>
+      <li class="active"><a href="charts.html">Top 10</a></li>
+    </ul>
+            </div>
+        </div>
+    </div>
+    
+    
+    <script type="text/template" id="input_container_template">
+    </script>
+    <script type="text/template" id="media_container_template">
+        <div class="media container_background collapsed">
+            <span href="" class="icon"></span>
+            <div class="media container">
+                <div class="media_header"></div>
+                <div class="media"></div>
+            </div>
+        </div>
+        <div class="stats container_background collapsed">
+            <a href="" class="icon"></a>
+            <div class="stats container">
+                <div class="wrapper">
+                </div>
+            </div>
+        </div>
+        <div class="code container_background collapsed">
+            <a class="fork" href="https://github.com/bittorrenttorque/onehash.com"><img style="position: absolute; top: 0; right: 0; border: 0;" src="images/fork.png" alt="Fork me on GitHub"></a>
+            <a href="" class="icon"></a>
+            <div class="code container">
+                <div class="wrapper">
+                    var btapp = new Btapp;<br>
+                    btapp.connect();<br>
+                    <br>
+                    btapp.live('torrent * file * properties streaming_url', function(url, file_props, file) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;//create an html5 video/audio tag and play!<br>
+                    });<br>
+                    <br>
+                    //lets add some content that will get detected by the code above.<br>
+                    btapp.on('add', function(add) {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;add.torrent('http://apps.bittorrent.com/torrents/PrettyLights-Bittorrent.torrent');<br>
+                    });<br>
+                    
+                </div>
+            </div>
+        </div>
+    </script>
+    
+    <div align="center">
+    	<br><br><br>
+    	<h1>Top 10 Tracks</h1>
+    	<br>
+    	<h2></h2>
+    	<br>
+    	<br>
+    	<br> <h2>Thin Lizzy - Whiskey in the Jar</h2>
+<p><a class="btn btn-danger" href="index.html#http://s3.amazonaws.com/bitmusic/torrents/ThinLizzy-WhiskeyInTheJar-BT.mp3.torrent">Stream</a></p>
+    </div>
+    </body>
+</html>
