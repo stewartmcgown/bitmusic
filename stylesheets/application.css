@@ -52,7 +52,7 @@ html, body {
 }
 
 .media.container_background .icon {
-	background-image: url(../images/loading.gif);
+	background-image: url(../images/load.gif);
 	background-size: 64px 64px;
 	background-color: white;
 	border: 3px solid rgba(150, 150, 150, 0.2);
@@ -252,6 +252,9 @@ html, body {
 	line-height: 120px;
 	color: #234552;
 }
+
+.input.container .logo:hover{ position: relative; 
+             top: -10px;} 
 
 .well {
 	background-color: rgb(235, 235, 235);

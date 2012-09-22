@@ -1,0 +1,196 @@
+
+<html><!-- -*- mode: javascript -*- -->
+<head>
+<title>BitMusic</title><!--'-->
+<style>
+#current_dir {
+  background-color: #eeeeee;
+  padding: 8px;
+}
+</style>
+<script type="text/javascript">
+
+var pwd = '';
+var root;
+var currentTree;
+var trek = [];
+var url = "http://bitmusic.s3.amazonaws.com/torrents";
+
+function makeTree(data) {
+  var tree = {};
+  for (var i = 0; i < data.length; i++) {
+   var tokens = data[i].split("/");
+   var branch = tree;
+   for (var b = 0; b < tokens.length; b++) {
+     var t = tokens[b];
+     if ( !branch[t] ) {
+       branch[t] = {};
+     }
+     branch = branch[t];
+   }
+  }
+  return tree;
+}
+
+function backtrack() {
+  currentTree = trek.pop();
+  pwd = pwd.substring(0, pwd.lastIndexOf("/"));
+  if (!currentTree) currentTree = root;
+  getTree(currentTree);
+}
+
+function getTree(tree, branch) {
+  if (branch) {
+   currentTree = tree[branch];
+   trek.push(tree);
+   pwd += "/" + branch;
+  }
+  var display = '<div id="current_dir"><b>' + pwd.substr(1) + '/</b>  ';
+  display += "<br/><a style='color:green' href=\"javascript:backtrack()\">go back</a> <span style='color: #999'>(there's more stuff back there)</span></div><br/>\n";
+  display += displayTree(currentTree);
+
+  document.getElementById("display").innerHTML = display;
+  if (pwd == '') {
+	  document.getElementById('current_dir').style.display = 'none';
+	  document.getElementById('loading').innerHTML = 'Here are some SONGS!  I like destroyer so much.';
+  } else {
+	  document.getElementById('current_dir').style.display = 'block';
+	  document.getElementById('loading').innerHTML = '';
+  }
+
+
+  window.location.hash = pwd;
+}
+
+function myescape(s) { return escape(s).replace(/\+/g, '%2b'); }
+//function myescape(s) { return escape(s).replace('%27', '\\%27'); }
+function escape_quotes(s) {
+	return s.replace(/\'/g, '\\\'').replace(/\"/g, '\\\"'); }
+function evalable(s) {
+	return "'" + escape_quotes(s) + "'"; }
+	//return escape_quotes("'" + s + "'"); }
+function displayTree(tree) {
+  var display = '';
+  for (var b in tree) {
+   if (tree.hasOwnProperty(b)) {
+	   var link;
+     if (isLeaf(tree[b])) {
+		 link = '<a href="' + url + myescape(pwd + "/" + b) + '">' + b + "</i><br/>\n";
+     } else {
+       link = "<a style=\"font-weight:bold;\" href=\"javascript:getTree(currentTree, " + evalable(b) + ")\">" + b + "</a><br/>\n";
+     }
+	 //console.log('Adding link', link);
+	 display += link;
+   }
+  }
+  return display;
+}
+
+function isLeaf(b) {
+  for (var l in b) {
+    if (!b.hasOwnProperty[l]) return false;
+  }
+  return true;
+}
+
+function parse(xmlDoc) {
+  var data = [];
+  var keys = xmlDoc.getElementsByTagName("Key");
+  for (var i = 0; i < keys.length; i++) {
+    var e = keys[i].firstChild.nodeValue;
+    
+    // only interested in some folders
+    if (e.indexOf("/./") < 0
+        && e.search(/_\$folder\$/) == -1
+        && e.search(/.DS_store/) == -1)
+      data.push(e);
+  }  
+  return data;
+}
+
+function jump_to_current_hash() {
+	var hash = window.location.hash;//'#Soft Moon/The Soft Moon'
+	hash = hash.substring(1);
+	
+	// Nevermind, that hash gets escaped in firefox but not safari/ie
+	hash = (location.href.split("#")[1] || "");
+	hash = unescape(hash)
+
+	var dirs = hash.split('/');
+	for (var i=0; i<dirs.length; i++) {
+		//console.log('Descending into', dirs[i]);
+		getTree(currentTree, dirs[i] == '' ? undefined : dirs[i]);
+	}
+}
+
+function init(){
+	var song_paths = [];
+	function fetch_index(starting_from) {
+		var request = window.XMLHttpRequest
+			? new XMLHttpRequest()
+			: new ActiveXObject("Microsoft.XMLHTTP");
+
+		var suffix = starting_from ? '&marker=' + starting_from : '';
+		request.open("GET", url + '?max-keys=300' + suffix, true);
+
+		request.onreadystatechange = function(){
+			if (request.readyState == 4 && request.status == 200) {
+				if (request.responseXML){
+					var last_page = (request.responseXML
+									 .getElementsByTagName('IsTruncated')[0]
+									 .childNodes[0].nodeValue == 'false');
+
+					// Add these new songs to our running list
+					var new_song_paths = parse(request.responseXML);
+					for (var i=1; i<new_song_paths.length; i++)
+						// Skip the first one (i==0), cause it's just
+						// the "marker" (in amazon api) we used to get
+						// here.  Put the rest into the songs queue.
+						song_paths.push(new_song_paths[i]);
+
+					if (last_page) {
+						// This is the last one!  Let's rock!
+						root = makeTree(song_paths);
+						currentTree = root;
+						console.log('Jumping to hash');
+						jump_to_current_hash();
+						console.log('Jumped to hash');
+						// Hide the loading indicators
+						//document.getElementById('loading').style.display = 'none';
+					} else {
+						// Get another page
+						document.getElementById('loading').innerHTML =
+						    document.getElementById('loading').innerHTML
+						    + ' loading more songs...';
+						fetch_index(song_paths[song_paths.length-1]);
+					}
+				}
+			}
+		}
+		request.send(null);
+	}
+
+	fetch_index();
+}
+
+
+// Because IE
+if(Function.prototype.bind&&console&&typeof console.log=="object"){["log","info","warn","error","assert","dir","clear","profile","profileEnd"].forEach(function(method){console[method]=this.call(console[method],console);},Function.prototype.bind);}
+if(!window.log){window.log=function(){log.history=log.history||[];log.history.push(arguments);if(typeof console!='undefined'&&typeof console.log=='function'){if(window.opera){var i=0;while(i<arguments.length){console.log("Item "+(i+1)+":"+arguments[i]);i++;}}
+else if((Array.prototype.slice.call(arguments)).length==1&&typeof Array.prototype.slice.call(arguments)[0]=='string'){console.log((Array.prototype.slice.call(arguments)).toString());}
+else{console.log(Array.prototype.slice.call(arguments));}}
+else if(!Function.prototype.bind&&typeof console!='undefined'&&typeof console.log=='object'){Function.prototype.call.call(console.log,console,Array.prototype.slice.call(arguments));}
+else{if(!document.getElementById('firebug-lite')){var script=document.createElement('script');script.type="text/javascript";script.id='firebug-lite';script.src='https://getfirebug.com/firebug-lite.js';document.getElementsByTagName('HEAD')[0].appendChild(script);setTimeout(function(){log(Array.prototype.slice.call(arguments));},2000);}
+else{setTimeout(function(){log(Array.prototype.slice.call(arguments));},500);}}}}
+
+</script>
+</head>
+
+<body onload="init();">
+<h2>toomimmusic</h2>
+<div style="font-family: courier, courier new;" id="loading"></div>
+<p style="display: none;"><b>:</b><span id="pwd"></span></p>
+<div id="display"></div>
+</body>
+
+</html>

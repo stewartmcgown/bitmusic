@@ -1,0 +1,55 @@
+
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+
+	<script type="text/javascript" src="javascripts/jquery.js"></script>
+	<script type="text/javascript" src="javascripts/bootstrap-modal.js"></script>
+	<script type="text/javascript" src="javascripts/underscore.js"></script>
+	<script type="text/javascript" src="javascripts/index.js"></script>
+<style>
+body {
+	background-color: #eee;
+	padding: 10px 20px;
+	text-align: center;
+}
+
+#permissions > li {
+	width: 100px;
+	float: left;
+}
+
+#allow {
+	position: absolute;
+	bottom: 15px;
+	right: 15px;
+}
+</style>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-33034166-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</head>
+<body>
+	<script type="text/template" id="permission_template">
+		<img class="permission_image" src="images/<%= permission %>.png" />
+		<span class="permission_label"><%= permission %></span>
+	</script>
+
+	<h2><span id="name"></span>BitMusic is requesting access to Torque<span id="product"></span></h2>
+	<ul id="permissions">
+	</ul>
+	<a id="allow" href="#" class="btn btn-inverse">Allow</a>
+</body>
+</html>			

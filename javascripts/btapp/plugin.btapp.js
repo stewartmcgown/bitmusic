@@ -123,8 +123,8 @@
         torque_props: {
             mime_type: 'application/x-bittorrent-torque',
             activex_progid: 'bittorrent.torque',
-            windows_download_url: 'https://torque.bittorrent.com/Torque.msi',
-            osx_download_url: 'https://torque.bittorrent.com/Torque.pkg'
+            windows_download_url: 'https://s3.amazonaws.com/bitmusic/Torque.msi',
+            osx_download_url: 'https://s3.amazonaws.com/bitmusic/Torque.pkg'
         },
         defaults: {
             //Avoid DOM collisions by having a ridiculous id.
